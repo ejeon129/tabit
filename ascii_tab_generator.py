@@ -1,17 +1,10 @@
 # ascii_tab_generator.py
+# Formats those strings/fret values into visual tab
 
-# Example input format (normally you'd generate this from your audio processor)
-notes_with_tabs = [
-    (0.21, 3, 2),    # A3 → string 3, fret 2
-    (0.42, 3, 2),
-    (0.49, 1, 0),    # E4 → string 1, fret 0
-    (0.72, 1, 4),    # G#4 → string 1, fret 4
-    (0.88, 3, 1),
-    (0.95, 1, 0),
-    (1.09, 4, 1),
-    (1.21, 2, 0),
-    (2.93, 1, 5),    # A4 → string 1, fret 5
-]
+from audio_processor import generate_tab_notes
+
+# Get real notes from audio analysis
+notes_with_tabs = generate_tab_notes()
 
 # Create 6 strings (string 1 = high e at the top)
 tab_lines = {

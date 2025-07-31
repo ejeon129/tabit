@@ -1,4 +1,5 @@
 # pitch_to_tab.py
+# Utility functions to map notes to the guitar fretboard
 
 import re
 

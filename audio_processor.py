@@ -1,4 +1,5 @@
 # audio_processor.py
+# Loads the audio, detects pitch, and uses pitch_to_tab to generate tab
 
 import librosa
 import numpy as np
@@ -37,18 +38,30 @@ def freq_to_note(freq):
 
 # Display results
 print("🎸 Cleaned Transcription:\n")
+def generate_tab_notes():
+    tab_notes = []
 
-for time, freq in detected_notes:
-    note = freq_to_note(freq)
-    if note is None:
-        continue
+    for time, freq in detected_notes:
+        note = freq_to_note(freq)
+        if note is None:
+            continue
 
-    tab_positions = find_tab_positions(note)
-    if not tab_positions:
-        continue
+        tab_positions = find_tab_positions(note)
+        if not tab_positions:
+            continue
 
-    best_position = min(tab_positions, key=lambda x: x[1])
-    string, fret = best_position
+        # Choose position with lowest fret
+        best_position = min(tab_positions, key=lambda x: x[1])
+        string, fret = best_position
 
-    print(f"Time: {time:.2f}s - Note: {note:<3} - Play on String {string}, Fret {fret}")
+        tab_notes.append((time, string, fret))
+
+    return tab_notes
+
+# Only run when script is called directly
+if __name__ == "__main__":
+    tab_notes = generate_tab_notes()
+    for t, s, f in tab_notes:
+        print(f"Time: {t:.2f}s - String {s} - Fret {f}")
+
 
