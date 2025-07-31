@@ -36,10 +36,19 @@ def freq_to_note(freq):
     return f"{note}{octave}"
 
 # Display results
-print("🎸 Transcription Results:\n")
+print("🎸 Cleaned Transcription:\n")
+
 for time, freq in detected_notes:
     note = freq_to_note(freq)
     if note is None:
         continue
+
     tab_positions = find_tab_positions(note)
-    print(f"Time: {time:.2f}s - Note: {note} - Tab: {tab_positions}")
+    if not tab_positions:
+        continue
+
+    best_position = min(tab_positions, key=lambda x: x[1])
+    string, fret = best_position
+
+    print(f"Time: {time:.2f}s - Note: {note:<3} - Play on String {string}, Fret {fret}")
+
