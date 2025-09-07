@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+/* Design tokens */
+@theme {
+  /* Colors */
+  --color-surface: #0f172a;    /* slate-900 */
+  --color-panel:   #111827;    /* gray-900-ish */
+  --color-border:  #1f2937;    /* slate-800 */
+  --color-text:    #e5e7eb;    /* slate-200 */
+  --color-muted:   #94a3b8;    /* slate-400 */
+  --color-brand-500: #6366f1;  /* indigo-500 */
+  --color-brand-600: #4f46e5;  /* indigo-600 */
+  --color-accent-500: #22c55e; /* emerald-500 */
+  --color-danger-500: #ef4444; /* red-500 */
+
+  /* Radii, shadows, spacing accents */
+  --radius-card: 1.25rem;
+  --shadow-card: 0 10px 30px rgba(0,0,0,.25);
+}
+
+/* App base */
+:root { color-scheme: dark; }
+body  { background: var(--color-surface); color: var(--color-text); }
+
