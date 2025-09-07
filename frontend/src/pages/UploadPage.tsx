@@ -1,76 +1,80 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Card, CardBody, CardHeader } from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
+import { Dropzone } from '../components/ui/Dropzone';
 
 export default function UploadPage() {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [tabOutput, setTabOutput] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
-    setTabOutput('');
-    setError('');
+  const accept = [
+    'audio/wav','audio/x-wav','audio/mpeg','audio/mp3','audio/mp4','audio/aac','audio/x-m4a'
+  ];
+
+  const onFile = (f: File) => {
+    if (!accept.includes(f.type)) return setError('Unsupported file. Use .wav, .mp3, or .m4a');
+    if (f.size > 30 * 1024 * 1024) return setError('File too large (≤ 30 MB).');
+    setError(null);
+    setFile(f);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!selectedFile) {
-      alert("Please select an audio file first!");
-      return;
-    }
+  const handleAnalyze = async () => {
+    if (!file) { setError('Please select a file first.'); return; }
 
-    const formData = new FormData();
-    formData.append("audio", selectedFile);
+    const form = new FormData();
+    form.append('audio', file);
 
     setLoading(true);
-    setError('');
-    setTabOutput('');
-
+    setError(null);
     try {
-      // If your Vite proxy is set, you can use '/transcribe' instead of the full URL
-      const response = await fetch("/transcribe", {
-        method: "POST",
-        body: formData,
-      });
+      // uses your Vite proxy: '/transcribe' -> http://127.0.0.1:5000/transcribe
+      const res = await fetch('/transcribe', { method: 'POST', body: form });
+      const text = await res.text();              // read body either way for better errors
+      if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
 
-      if (!response.ok) throw new Error("Failed to transcribe file");
-
-      const text = await response.text();
-      setTabOutput(text);
-
-      // Navigate to results and pass the output
+      // go to results and pass the tabs
       navigate('/result', { state: { tabOutput: text } });
-    } catch (err) {
-      setError(err.message || "Something went wrong");
+    } catch (e: any) {
+      setError(e?.message ?? 'Something went wrong while transcribing.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="mx-auto max-w-screen-md p-6">
-      <h1 className="text-3xl font-bold">🎸 Tabit</h1>
-      <p className="mt-1 text-slate-400">Upload a guitar clip to generate ASCII tabs.</p>
+    <div className="space-y-8">
+      <div className="text-center">
+        <h1 className="text-3xl font-semibold tracking-tight">Convert a guitar clip to tabs</h1>
+        <p className="mt-2 text-sm text-muted">Upload a short recording to generate tablature.</p>
+      </div>
 
-      <form onSubmit={handleSubmit} className="mt-6 flex items-center gap-3">
-        <input
-          type="file"
-          accept="audio/*"
-          onChange={handleFileChange}
-          className="block text-sm file:mr-4 file:rounded-lg file:border-0 file:bg-indigo-600 file:px-4 file:py-2 file:text-white hover:file:bg-indigo-500"
-        />
-        <button
-          type="submit"
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-500 disabled:opacity-60"
-          disabled={loading}
-        >
-          {loading ? 'Transcribing…' : 'Upload'}
-        </button>
-      </form>
+      <Card>
+        <CardBody>
+          <Dropzone onFile={onFile} />
 
-      {error && <p className="mt-3 text-red-400">Error: {error}</p>}
+          {file && (
+            <div className="mt-4 flex items-center justify-between rounded-lg border border-border/70 p-3 text-sm">
+              <div>
+                <strong className="font-medium">{file.name}</strong>
+                <span className="text-muted"> • {(file.size/1024/1024).toFixed(1)} MB</span>
+              </div>
+              <Button
+                onClick={handleAnalyze}
+                loading={loading}
+                disabled={!file || loading}
+              >
+                {loading ? 'Analyzing…' : 'Analyze'}
+              </Button>
+            </div>
+          )}
+
+          {error && <p className="mt-3 text-sm text-danger-500">{error}</p>}
+
+        </CardBody>
+      </Card>
     </div>
   );
 }

@@ -1,43 +1,47 @@
 import { useLocation, Link } from 'react-router-dom';
+import { Card, CardBody, CardHeader } from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
+import { MonoBlock } from '../components/ui/MonoBlock';
 
 export default function ResultsPage() {
-  const location = useLocation();
-  const tabOutput = location.state?.tabOutput || '';
+  const { state } = useLocation() as { state?: { tabOutput?: string } };
+  const tabOutput = state?.tabOutput ?? '';
 
   return (
-    <div className="mx-auto max-w-screen-md p-6">
-      <h2 className="text-2xl font-semibold">Generated Tabs</h2>
+    <div className="grid gap-6 md:grid-cols-2">
+      <Card>
+        <CardHeader title="Generated tabs" subtitle="Copy or export below" />
+        <CardBody>
+          {tabOutput ? (
+            <>
+              <MonoBlock text={tabOutput} />
+              <div className="mt-4 flex flex-wrap gap-3">
+                <Button
+                  onClick={() => navigator.clipboard.writeText(tabOutput)}
+                >
+                  Copy
+                </Button>
+                <a
+                  href={`data:text/plain;charset=utf-8,${encodeURIComponent(tabOutput)}`}
+                  download={`tabit_${Date.now()}.txt`}
+                  className="inline-flex items-center justify-center rounded-xl border border-border px-4 py-2.5 text-sm hover:border-white/40"
+                >
+                  Download TXT
+                </a>
+              </div>
+            </>
+          ) : (
+            <div>
+              <p className="text-sm text-muted">No tabs to display. Upload a file first.</p>
+              <Link to="/" className="mt-3 inline-block rounded-xl bg-brand-600 px-4 py-2.5 text-sm text-white hover:bg-brand-500">
+                Go to Upload
+              </Link>
+            </div>
+          )}
+        </CardBody>
+      </Card>
 
-      {!tabOutput ? (
-        <div className="mt-4 rounded-lg border border-slate-700 p-4">
-          <p className="text-slate-300">No tabs to display. Please upload a file first.</p>
-          <Link to="/" className="mt-3 inline-block rounded-lg bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-500">
-            Go to Upload
-          </Link>
-        </div>
-      ) : (
-        <div className="mt-4">
-          <pre className="overflow-auto rounded-xl bg-[#0B1020] p-4 text-sm leading-relaxed whitespace-pre text-slate-200">
-{tabOutput}
-          </pre>
-
-          <div className="mt-4 flex gap-3">
-            <button
-              onClick={async () => { try { await navigator.clipboard.writeText(tabOutput); } catch {} }}
-              className="rounded-lg border border-slate-700 px-3 py-2 hover:border-slate-500"
-            >
-              Copy
-            </button>
-            <a
-              href={`data:text/plain;charset=utf-8,${encodeURIComponent(tabOutput)}`}
-              download={`tabit_${Date.now()}.txt`}
-              className="rounded-lg border border-slate-700 px-3 py-2 hover:border-slate-500"
-            >
-              Download TXT
-            </a>
-          </div>
-        </div>
-      )}
+      {/* keep your audio/placeholder card on the other column if you like */}
     </div>
   );
 }

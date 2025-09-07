@@ -1,24 +1,30 @@
 @import "tailwindcss";
 
-/* Design tokens */
+/* === Design tokens (v4 CSS-first) === */
 @theme {
-  /* Colors */
-  --color-surface: #0f172a;    /* slate-900 */
-  --color-panel:   #111827;    /* gray-900-ish */
-  --color-border:  #1f2937;    /* slate-800 */
-  --color-text:    #e5e7eb;    /* slate-200 */
-  --color-muted:   #94a3b8;    /* slate-400 */
-  --color-brand-500: #6366f1;  /* indigo-500 */
-  --color-brand-600: #4f46e5;  /* indigo-600 */
-  --color-accent-500: #22c55e; /* emerald-500 */
-  --color-danger-500: #ef4444; /* red-500 */
+  --color-bg:        #0b1020; /* deeper than slate-900 */
+  --color-panel:     #0f172a; /* slate-900 */
+  --color-border:    #1f2937; /* slate-800 */
+  --color-muted:     #94a3b8; /* slate-400 */
+  --color-text:      #e5e7eb; /* slate-200 */
 
-  /* Radii, shadows, spacing accents */
-  --radius-card: 1.25rem;
-  --shadow-card: 0 10px 30px rgba(0,0,0,.25);
+  --color-brand-500: #6366f1; /* indigo-500 */
+  --color-brand-600: #4f46e5; /* indigo-600 */
+  --color-accent-500:#22c55e; /* emerald-500 */
+  --color-danger-500:#ef4444; /* red-500 */
+
+  --radius-card: 16px;
+  --shadow-card: 0 20px 50px rgba(0,0,0,.35);
 }
 
-/* App base */
+/* === App base === */
 :root { color-scheme: dark; }
-body  { background: var(--color-surface); color: var(--color-text); }
+body  { background: var(--color-bg); color: var(--color-text); }
 
+/* Subtle gradient header + grain background */
+.app-bg {
+  background:
+    radial-gradient(1200px 600px at 20% -10%, rgba(79,70,229,.20), transparent 60%),
+    radial-gradient(1000px 500px at 100% 0%, rgba(34,197,94,.12), transparent 60%),
+    linear-gradient(to bottom, rgba(255,255,255,.02), rgba(255,255,255,0));
+}
