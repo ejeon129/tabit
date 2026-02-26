@@ -87,8 +87,11 @@ export default function UploadPage() {
   return (
     <div className="space-y-8">
       <div className="text-center">
-        <h1 className="text-3xl font-semibold tracking-tight">Convert a guitar clip to tabs</h1>
-        <p className="mt-2 text-sm text-muted">Upload a short recording to generate tablature.</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">Transcription Studio</p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">Convert a guitar clip into playable tabs</h1>
+        <p className="mx-auto mt-3 max-w-2xl text-sm text-muted">
+          Upload a short recording and get a clean ASCII tab draft you can copy, export, and refine.
+        </p>
       </div>
 
       <Card>
@@ -96,7 +99,7 @@ export default function UploadPage() {
           <Dropzone onFile={onFile} />
 
           {file && (
-            <div className="mt-4 flex items-center justify-between rounded-lg border border-border/70 p-3 text-sm">
+            <div className="mt-4 flex items-center justify-between rounded-xl border border-border bg-white/85 p-3 text-sm">
               <div>
                 <strong className="font-medium">{file.name}</strong>
                 <span className="text-muted"> • {(file.size/1024/1024).toFixed(1)} MB</span>

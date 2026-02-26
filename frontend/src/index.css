@@ -1,37 +1,55 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap");
 
-/* === Design tokens (v4 CSS-first) === */
 @theme {
-  --color-bg:        #0b1020; /* deeper than slate-900 */
-  --color-panel:     #0f172a; /* slate-900 */
-  --color-border:    #1f2937; /* slate-800 */
-  --color-muted:     #94a3b8; /* slate-400 */
-  --color-text:      #e5e7eb; /* slate-200 */
+  --font-sans: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "IBM Plex Mono", monospace;
 
-  --color-brand-500: #6366f1; /* indigo-500 */
-  --color-brand-600: #4f46e5; /* indigo-600 */
-  --color-accent-500:#22c55e; /* emerald-500 */
-  --color-danger-500:#ef4444; /* red-500 */
+  --color-bg: #f3f6fb;
+  --color-panel: #ffffff;
+  --color-border: #d7e1ec;
+  --color-muted: #556476;
+  --color-text: #0f1f2f;
 
-  --radius-card: 16px;
-  --shadow-card: 0 20px 50px rgba(0,0,0,.35);
-}
+  --color-brand-500: #0f766e;
+  --color-brand-600: #0b5f59;
+  --color-accent-500: #f59e0b;
+  --color-danger-500: #dc2626;
 
-/* === App base === */
-:root { color-scheme: dark; }
-body  { background: var(--color-bg); color: var(--color-text); }
-
-/* Subtle gradient header + grain background */
-.app-bg {
-  background:
-    radial-gradient(1200px 600px at 20% -10%, rgba(79,70,229,.20), transparent 60%),
-    radial-gradient(1000px 500px at 100% 0%, rgba(34,197,94,.12), transparent 60%),
-    linear-gradient(to bottom, rgba(255,255,255,.02), rgba(255,255,255,0));
+  --radius-card: 18px;
+  --shadow-card: 0 20px 45px rgba(12, 25, 45, 0.1);
 }
 
 :root {
+  color-scheme: light;
   --safe-top: env(safe-area-inset-top);
   --safe-bottom: env(safe-area-inset-bottom);
 }
-header { padding-top: max(0.5rem, var(--safe-top)); }
-footer { padding-bottom: max(0.5rem, var(--safe-bottom)); }
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+.app-bg {
+  background:
+    radial-gradient(1000px 550px at 8% -10%, rgba(15, 118, 110, 0.16), transparent 62%),
+    radial-gradient(900px 500px at 100% -12%, rgba(245, 158, 11, 0.15), transparent 60%),
+    linear-gradient(180deg, #f9fbff 0%, #f3f6fb 45%, #eef3f9 100%);
+}
+
+header {
+  padding-top: max(0.5rem, var(--safe-top));
+}
+
+footer {
+  padding-bottom: max(0.5rem, var(--safe-bottom));
+}

@@ -24,9 +24,10 @@ export default function ResultsPage() {
   const { state } = useLocation() as { state?: { result?: TranscribeResponse; sourceName?: string } };
   const result = state?.result;
   const tabOutput = result?.ascii_tab ?? '';
+  const eventsPreview = result?.events?.slice(0, 8) ?? [];
 
   return (
-    <div className="grid gap-6 md:grid-cols-2">
+    <div className="grid gap-6 md:grid-cols-[1.6fr_1fr]">
       <Card>
         <CardHeader title="Generated tabs" subtitle="Copy or export below" />
         <CardBody>
@@ -75,7 +76,42 @@ export default function ResultsPage() {
         </CardBody>
       </Card>
 
-      {/* keep your audio/placeholder card on the other column if you like */}
+      <Card>
+        <CardHeader title="Analysis summary" subtitle="Quick session details" />
+        <CardBody className="space-y-4">
+          {result ? (
+            <>
+              <div className="rounded-xl border border-border bg-white/85 p-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted">Metrics</p>
+                <div className="mt-2 grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-muted">Detected notes</p>
+                    <p className="text-lg font-semibold">{result.metrics.event_count}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted">Clip length</p>
+                    <p className="text-lg font-semibold">{result.metrics.duration_sec}s</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-border bg-white/85 p-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted">First notes</p>
+                <ul className="mt-2 space-y-1 text-sm">
+                  {eventsPreview.map((event, idx) => (
+                    <li key={`${event.time_sec}-${event.note}-${idx}`} className="flex justify-between">
+                      <span>{event.note}</span>
+                      <span className="text-muted">S{event.string} • F{event.fret}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </>
+          ) : (
+            <p className="text-sm text-muted">Run a transcription to see metrics and note mapping details.</p>
+          )}
+        </CardBody>
+      </Card>
     </div>
   );
 }

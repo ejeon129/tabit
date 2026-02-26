@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 
 export function Card({ className='', children }) {
   return (
-    <div className={`rounded-[var(--radius-card)] bg-panel border border-border/70 shadow-[var(--shadow-card)] ${className}`}>
+    <div className={`rounded-[var(--radius-card)] border border-border bg-panel/95 shadow-[var(--shadow-card)] ${className}`}>
       {children}
     </div>
   );
