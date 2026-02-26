@@ -1,21 +1,45 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardBody, CardHeader } from '../components/ui/Card';
+import { Card, CardBody } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Dropzone } from '../components/ui/Dropzone';
+
+type TabEvent = {
+  time_sec: number;
+  note: string;
+  string: number;
+  fret: number;
+};
+
+type TranscribeResponse = {
+  ascii_tab: string;
+  events: TabEvent[];
+  metrics: {
+    event_count: number;
+    duration_sec: number;
+    sample_rate_hz: number;
+  };
+};
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [stage, setStage] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const accept = [
-    'audio/wav','audio/x-wav','audio/mpeg','audio/mp3','audio/mp4','audio/aac','audio/x-m4a'
+    'audio/wav','audio/x-wav','audio/mpeg','audio/mp3','audio/mp4','audio/aac','audio/x-m4a','audio/ogg','audio/flac'
   ];
+  const allowedExtensions = ['wav', 'mp3', 'm4a', 'aac', 'ogg', 'flac'];
 
   const onFile = (f: File) => {
-    if (!accept.includes(f.type)) return setError('Unsupported file. Use .wav, .mp3, or .m4a');
+    const extension = f.name.split('.').pop()?.toLowerCase();
+    const extensionAllowed = extension ? allowedExtensions.includes(extension) : false;
+    const mimeAllowed = accept.includes(f.type);
+    if (!mimeAllowed && !extensionAllowed) {
+      return setError('Unsupported file. Use .wav, .mp3, .m4a, .aac, .ogg, or .flac');
+    }
     if (f.size > 30 * 1024 * 1024) return setError('File too large (≤ 30 MB).');
     setError(null);
     setFile(f);
@@ -28,19 +52,35 @@ export default function UploadPage() {
     form.append('audio', file);
 
     setLoading(true);
+    setStage('Transcribing...');
     setError(null);
     try {
-      // uses your Vite proxy: '/transcribe' -> http://127.0.0.1:5000/transcribe
       const res = await fetch('/transcribe', { method: 'POST', body: form });
-      const text = await res.text();              // read body either way for better errors
-      if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+      const raw = await res.text();
 
-      // go to results and pass the tabs
-      navigate('/result', { state: { tabOutput: text } });
+      let payload: TranscribeResponse | { error?: string } | null = null;
+      try {
+        payload = raw ? JSON.parse(raw) : null;
+      } catch {
+        payload = null;
+      }
+
+      if (!res.ok) {
+        const message = (payload as { error?: string } | null)?.error ?? raw ?? `HTTP ${res.status}`;
+        throw new Error(message);
+      }
+
+      const result = payload as TranscribeResponse | null;
+      if (!result?.ascii_tab) {
+        throw new Error('Backend returned an unexpected response.');
+      }
+
+      navigate('/result', { state: { result, sourceName: file.name } });
     } catch (e: any) {
       setError(e?.message ?? 'Something went wrong while transcribing.');
     } finally {
       setLoading(false);
+      setStage(null);
     }
   };
 
@@ -72,6 +112,7 @@ export default function UploadPage() {
           )}
 
           {error && <p className="mt-3 text-sm text-danger-500">{error}</p>}
+          {loading && stage && <p className="mt-3 text-xs text-muted">{stage}</p>}
 
         </CardBody>
       </Card>

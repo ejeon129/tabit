@@ -1,63 +1,43 @@
-# 🎸 Tabit
+# Tabit
 
-**Convert short-form guitar clips into playable ASCII tablature.**  
-Built with React + Flask, Tabit is an MVP that helps guitar learners transcribe melodies from audio with minimal effort.
+Convert short-form guitar clips into playable ASCII tablature.
 
----
+## What Works Today
 
-## ✨ Features
+- Upload audio clips (`.wav`, `.mp3`, `.m4a`, `.aac`, `.ogg`, `.flac`) in the web app
+- Backend transcribes likely melodic notes with `librosa`
+- Notes are mapped to practical string/fret positions for standard tuning
+- UI returns copyable/downloadable ASCII tabs with basic metrics
 
-- 🎧 Upload an audio file of a guitar performance
-- 🧠 Detects notes and converts them to standard pitch notation (e.g., A3, E4)
-- 🎯 Maps notes to the optimal string/fret combo on a standard-tuned 6-string guitar
-- 📜 Renders a playable, properly aligned ASCII guitar tab in the browser
+## Architecture
 
----
-
-## 🧱 Tech Stack
-
-| Layer      | Tech           |
-|------------|----------------|
-| Frontend   | React (Vite)   |
-| Backend    | Flask + Python |
-| Audio      | Librosa, NumPy |
-| Dev Tools  | Git, GitHub, Vite, virtualenv |
-
----
-
-## 🔄 How It Works
-
-```
-[Upload .wav/mp3 file] → [Flask API] → [librosa analyzes audio] 
-→ [Pitch detection] → [Tab position mapping] → [ASCII tab returned to frontend]
+```text
+React (Vite) frontend
+  -> POST /transcribe
+Flask API
+  -> audio_processor.py (onsets + pitch estimation)
+  -> pitch_to_tab.py (string/fret selection)
+  -> ascii_tab_generator.py (timing-aware ASCII rendering)
 ```
 
----
+## Local Setup
 
-## 🚀 Getting Started
+### 1) Backend
 
-### 1. Clone the repo
+From repo root:
 
 ```bash
-git clone https://github.com/ejeon129/tabit.git
-cd tabit
-```
-
-### 2. Set up the backend
-
-```bash
-cd backend
-python3 -m venv venv
 source venv/bin/activate
+cd backend
 pip install -r requirements.txt
 python app.py
 ```
 
-This will start the Flask server at: `http://127.0.0.1:5000`
+Backend runs at `http://127.0.0.1:5000`.
 
-### 3. Start the frontend
+### 2) Frontend
 
-In a new terminal tab:
+In another terminal:
 
 ```bash
 cd frontend
@@ -65,48 +45,40 @@ npm install
 npm run dev
 ```
 
-This will start the React app at: `http://localhost:5173`
+Frontend runs at `http://localhost:5173` and proxies `/transcribe` to Flask.
 
----
+## API Response
 
-## 📸 Sample Output
+`POST /transcribe` returns JSON:
 
+```json
+{
+  "ascii_tab": "e|---0-...\nB|------...\n...",
+  "events": [
+    { "time_sec": 0.252, "note": "G3", "string": 3, "fret": 0 }
+  ],
+  "metrics": {
+    "event_count": 22,
+    "duration_sec": 8.31,
+    "sample_rate_hz": 22050
+  }
+}
 ```
-e|------0--4-----0--------5--
-B|---------------------0-----
-G|2--2--------1--------------
-D|------------------1--------
-A|---------------------------
-E|---------------------------
-```
 
----
+## Current Limits
 
-## ⚠️ Known Limitations
+- Best on monophonic or lightly layered guitar clips
+- Assumes standard EADGBE tuning
+- Rhythm notation and advanced techniques (slides/bends/chords) are not yet inferred
 
-- Works best with clean, monophonic guitar clips (single-note playing)
-- Tuning is assumed to be standard EADGBE
-- Timing/duration not captured in tab yet (no note lengths)
+## Monetization-Oriented MVP Roadmap
 
----
+1. Source ingestion: paste TikTok/YouTube/IG URL, extract audio segment server-side
+2. Better transcription: chord detection + confidence scoring + bar-aligned output
+3. Accounts/paywall: free tier (limited transcriptions), paid monthly unlimited
+4. Queue + background jobs: async processing for longer clips
+5. Export + library: save tabs, PDF export, shareable public links
 
-## 🛣 Roadmap
+## License
 
-- [ ] Improve tab formatting and spacing
-- [ ] Add file size/type validation
-- [ ] Display waveform or playback
-- [ ] Deploy to Render / Vercel
-- [ ] Add user accounts for saving tabs
-
----
-
-## 🙋‍♂️ Author
-
-Eric Jeon  
-Built as a full-stack portfolio project to demonstrate audio processing, React/Flask integration, and practical music tooling.
-
----
-
-## 📄 License
-
-MIT — free to use, modify, and share.
+MIT

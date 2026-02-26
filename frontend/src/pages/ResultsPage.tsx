@@ -3,15 +3,49 @@ import { Card, CardBody, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { MonoBlock } from '../components/ui/MonoBlock';
 
+type TabEvent = {
+  time_sec: number;
+  note: string;
+  string: number;
+  fret: number;
+};
+
+type TranscribeResponse = {
+  ascii_tab: string;
+  events: TabEvent[];
+  metrics: {
+    event_count: number;
+    duration_sec: number;
+    sample_rate_hz: number;
+  };
+};
+
 export default function ResultsPage() {
-  const { state } = useLocation() as { state?: { tabOutput?: string } };
-  const tabOutput = state?.tabOutput ?? '';
+  const { state } = useLocation() as { state?: { result?: TranscribeResponse; sourceName?: string } };
+  const result = state?.result;
+  const tabOutput = result?.ascii_tab ?? '';
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <Card>
         <CardHeader title="Generated tabs" subtitle="Copy or export below" />
         <CardBody>
+          {result && (
+            <div className="mb-4 flex flex-wrap gap-2 text-xs">
+              <span className="rounded-full border border-border px-2 py-1 text-muted">
+                Notes: {result.metrics.event_count}
+              </span>
+              <span className="rounded-full border border-border px-2 py-1 text-muted">
+                Duration: {result.metrics.duration_sec}s
+              </span>
+              {state?.sourceName && (
+                <span className="rounded-full border border-border px-2 py-1 text-muted">
+                  File: {state.sourceName}
+                </span>
+              )}
+            </div>
+          )}
+
           {tabOutput ? (
             <>
               <MonoBlock text={tabOutput} />
